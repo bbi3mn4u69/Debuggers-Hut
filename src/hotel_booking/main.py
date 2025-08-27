@@ -82,7 +82,7 @@ def run_once() -> bool:
     except KeyboardInterrupt:
         print("\n\nBooking cancelled by user.")
         logger.info("Booking cancelled by user")
-        return False
+        raise  # Re-raise the KeyboardInterrupt to exit the entire application
     except Exception as e:
         logger.error(f"Error during booking process: {e}")
         print(f"\nError: {e}")

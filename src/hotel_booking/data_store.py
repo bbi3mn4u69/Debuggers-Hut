@@ -21,6 +21,13 @@ def get_rate(apartment_id: str) -> float:
     """
     Return nightly rate for a known apartment.
     
+    Note:
+        - Apartment ID is case-insensitive
+        - Apartment ID is stored in lowercase in the storage manager
+        - Apartment ID is stored in lowercase in the local storage
+        - Apartment ID is stored in lowercase in the _apartments dictionary
+        - Apartment ID is stored in lowercase in the _guests_points dictionary
+        - Apartment ID is stored in lowercase in the _storage_manager dictionary
     Args:
         apartment_id: The apartment identifier
         
@@ -32,10 +39,16 @@ def get_rate(apartment_id: str) -> float:
         from .storage_manager import get_storage_manager
         storage_manager = get_storage_manager()
         apartments = storage_manager.view_apartments()
-        rate = apartments.get(apartment_id, 0.0)
+        
+        apartment_id_lower = apartment_id.lower()
+        storage_apartments_lower = {k.lower(): v for k, v in apartments.items()}
+        
+        rate = storage_apartments_lower.get(apartment_id_lower, 0.0)
     except ImportError:
         # Fallback to local storage if storage manager is not available
-        rate = _apartments.get(apartment_id, 0.0)
+        apartment_id_lower = apartment_id.lower()
+        storage_apartments_lower = {k.lower(): v for k, v in _apartments.items()}
+        rate = storage_apartments_lower.get(apartment_id_lower, 0.0)
     
     if rate == 0.0:
         logger.warning(f"Unknown apartment ID: {apartment_id}")
@@ -109,8 +122,9 @@ def get_all_apartments() -> Dict[str, float]:
         from .storage_manager import get_storage_manager
         storage_manager = get_storage_manager()
         return storage_manager.view_apartments()
-    except ImportError:
+    except (ImportError, Exception) as e:
         # Fallback to local storage if storage manager is not available
+        logger.warning(f"Storage manager not available, using local storage: {e}")
         return _apartments.copy()
 
 
@@ -126,6 +140,7 @@ def get_all_guests() -> Dict[str, int]:
         from .storage_manager import get_storage_manager
         storage_manager = get_storage_manager()
         return storage_manager.view_guests()
-    except ImportError:
+    except (ImportError, Exception) as e:
         # Fallback to local storage if storage manager is not available
+        logger.warning(f"Storage manager not available, using local storage: {e}")
         return _guests_points.copy()

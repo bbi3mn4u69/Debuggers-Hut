@@ -221,7 +221,9 @@ def prompt_booking_date() -> str:
             if not booking_date:
                 print("Error: Booking date cannot be empty. Please try again.")
                 continue
-            
+            if not _validate_date(booking_date):
+                print(f"Error: Invalid date format. Please use {DATE_FORMAT} and try again.")
+                continue
             logger.debug(f"Booking date entered: {booking_date}")
             return booking_date
             

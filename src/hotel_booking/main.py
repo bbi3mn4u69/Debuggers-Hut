@@ -49,11 +49,21 @@ def run_once() -> bool:
         length_of_stay = prompt_length_of_stay()
         booking_date = prompt_booking_date()
 
+        # Resolve canonical apartment ID (case-insensitive lookup against storage)
+        try:
+            from .storage_manager import get_storage_manager
+            apartments_map = get_storage_manager().view_apartments()
+        except Exception:
+            from .data_store import get_all_apartments
+            apartments_map = get_all_apartments()
+        apartment_id_lower = apartment_id.lower()
+        canonical_apartment_id = next((k for k in apartments_map.keys() if k.lower() == apartment_id_lower), apartment_id)
+
         # Compute totals
-        rate = get_rate(apartment_id)
+        rate = get_rate(canonical_apartment_id)
         if rate == 0.0:
-            logger.warning(f"Unknown apartment ID: {apartment_id}")
-            print(f"\nWarning: Apartment '{apartment_id}' not found. Rate set to $0.00")
+            logger.warning(f"Unknown apartment ID: {canonical_apartment_id}")
+            print(f"\nWarning: Apartment '{canonical_apartment_id}' not found. Rate set to $0.00")
         
         total = compute_total_cost(rate, length_of_stay)
         earned = points_round_half_up(total)
@@ -62,7 +72,7 @@ def run_once() -> bool:
         print_receipt(
             guest_name=guest_name,
             num_guests=num_guests,
-            apartment_id=apartment_id,
+            apartment_id=canonical_apartment_id,
             apartment_rate=rate,
             checkin=checkin,
             checkout=checkout,

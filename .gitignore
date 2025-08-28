@@ -164,4 +164,9 @@ cython_debug/
 # Project specific
 hotel_booking.log
 *.log
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.pdf
 assignment-details/

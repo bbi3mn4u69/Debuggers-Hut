@@ -2,12 +2,12 @@
 Receipt formatting and printing for the Hotel Booking System (Part 2).
 """
 
-import logging
+
 from typing import Optional
 
 from .config import HOTEL_NAME, CURRENCY
 
-logger = logging.getLogger(__name__)
+
 LINE = "=" * 57
 
 
@@ -66,10 +66,10 @@ def print_receipt(
         print("Thank you for your booking! We hope you will have an enjoyable stay.")
         print(LINE)
 
-        logger.info("Receipt printed for %s - Total: $%.2f", guest_name, total_cost)
+     
 
     except Exception as e:
-        logger.error("Error printing receipt: %s", e)
+  
         print("Error: Could not print receipt properly.")
 
 

@@ -2,10 +2,9 @@
 Business logic and calculations for the Hotel Booking System.
 """
 
-import logging
 from typing import Union
 
-logger = logging.getLogger(__name__)
+
 
 
 def compute_total_cost(rate: float, nights: int) -> float:
@@ -29,7 +28,6 @@ def compute_total_cost(rate: float, nights: int) -> float:
         raise ValueError("Number of nights cannot be negative")
     
     total = rate * nights
-    logger.debug(f"Calculated total cost: ${rate:.2f} × {nights} nights = ${total:.2f}")
     return total
 
 
@@ -53,7 +51,7 @@ def points_round_half_up(amount_aud: float) -> int:
         raise ValueError("Amount cannot be negative")
     
     points = int(amount_aud + 0.5)
-    logger.debug(f"Calculated reward points: ${amount_aud:.2f} -> {points} points")
+
     return points
 
 

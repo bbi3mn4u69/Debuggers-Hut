@@ -2,12 +2,11 @@
 User input handling and validation for the Hotel Booking System (Part 2).
 """
 
-import logging
 
 from .config import DATE_FORMAT
 from .data_store import list_apartments, list_items
 
-logger = logging.getLogger(__name__)
+
 
 DATE_FORMAT = "d/m/yyyy"
 _DATETIME_FORMAT = "%d/%m/%Y"
@@ -25,13 +24,13 @@ def prompt_guest_name() -> str:
             if len(name) > 100:
                 print("Error: Guest name is too long. Please use a shorter name.")
                 continue
-            logger.debug("Guest name: %s", name)
+         
             return name
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
             raise
         except Exception as e:
-            logger.error("Error getting guest name: %s", e)
+           
             print("An error occurred. Please try again.")
 
 def prompt_num_guests() -> int:
@@ -44,7 +43,7 @@ def prompt_num_guests() -> int:
             if num > 20:
                 print("Error: Maximum 20 guests allowed.")
                 continue
-            logger.debug("Guests: %d", num)
+          
             return num
         except ValueError:
             print("Error: Please enter a valid number.")
@@ -62,7 +61,7 @@ def prompt_apartment_id() -> str:
             if len(apartment_id) > 20:
                 print("Error: Apartment ID is too long.")
                 continue
-            logger.debug("Apartment ID entered: %s", apartment_id)
+           
             return apartment_id
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
@@ -111,7 +110,7 @@ def prompt_checkin() -> str:
             if not _validate_date(checkin):
                 print(f"Error: Invalid date. Use {DATE_FORMAT}.")
                 continue
-            logger.debug("Check-in: %s", checkin)
+         
             return checkin
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
@@ -127,7 +126,7 @@ def prompt_checkout() -> str:
             if not _validate_date(checkout):
                 print(f"Error: Invalid date. Use {DATE_FORMAT}.")
                 continue
-            logger.debug("Check-out: %s", checkout)
+          
             return checkout
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
@@ -143,7 +142,7 @@ def prompt_length_of_stay() -> int:
             if nights > 365:
                 print("Error: Maximum stay is 365 nights.")
                 continue
-            logger.debug("Nights: %d", nights)
+         
             return nights
         except ValueError:
             print("Error: Please enter a valid number.")
@@ -161,7 +160,7 @@ def prompt_booking_date() -> str:
             if not _validate_date(booking_date):
                 print(f"Error: Invalid date. Use {DATE_FORMAT}.")
                 continue
-            logger.debug("Booking date: %s", booking_date)
+            
             return booking_date
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")

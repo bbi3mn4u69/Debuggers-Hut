@@ -2,13 +2,11 @@
 Data storage and management for the Hotel Booking System (Part 2).
 """
 
-import logging
 import re
 from typing import Dict, Any
 
 from .config import APARTMENTS, GUESTS_POINTS, SUPPLEMENTARY_ITEMS
 
-logger = logging.getLogger(__name__)
 
 # In-memory stores
 _guests_points: Dict[str, int] = GUESTS_POINTS.copy()
@@ -46,7 +44,7 @@ def get_rate(apartment_id: str) -> float:
     for k, v in _apartments.items():
         if k.lower() == aid:
             return float(v["rate"])
-    logger.warning("Unknown apartment ID: %s", apartment_id)
+
     return 0.0
 
 def get_capacity(apartment_id: str) -> int:
@@ -68,7 +66,7 @@ def add_points(guest_name: str, earned: int) -> int:
         raise ValueError("Earned points cannot be negative")
     new_total = _guests_points.get(guest_name, 0) + earned
     _guests_points[guest_name] = new_total
-    logger.info("Added %s points to %s. New total: %s", earned, guest_name, new_total)
+ 
     return new_total
 
 def spend_points(guest_name: str, points: int) -> int:
@@ -80,7 +78,7 @@ def spend_points(guest_name: str, points: int) -> int:
         raise ValueError("Insufficient points")
     new_total = balance - points
     _guests_points[guest_name] = new_total
-    logger.info("Deducted %s points from %s. New total: %s", points, guest_name, new_total)
+
     return new_total
 
 def get_guest_points(guest_name: str) -> int:
@@ -103,7 +101,7 @@ def upsert_apartment(apartment_id: str, rate: float, capacity: int) -> None:
     if capacity <= 0:
         raise ValueError("Capacity must be positive")
     _apartments[apartment_id] = {"rate": float(rate), "capacity": int(capacity)}
-    logger.info("Apartment saved: %s (rate=%.2f, cap=%d)", apartment_id, rate, capacity)
+ 
 
 def upsert_items_bulk(line: str) -> None:
     """
@@ -128,7 +126,7 @@ def upsert_items_bulk(line: str) -> None:
             raise ValueError(f"Price for '{iid}' must be > 0")
         changes[iid] = price
     _items.update(changes)
-    logger.info("Supplementary items upserted: %s", list(changes.keys()))
+
 
 
 # ---------- Order history ----------

@@ -3,7 +3,7 @@ Main application entry point for the Hotel Booking System (Part 2).
 Menu-driven program, extra-bed rule, reward redemption, and order history.
 """
 
-import logging
+
 import sys
 
 from .data_store import (
@@ -23,14 +23,6 @@ from .io_prompts import (
     prompt_upsert_apartment_line, prompt_items_bulk_line,
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("hotel_booking.log")],
-)
-logger = logging.getLogger(__name__)
-
 
 # ---------- Core booking flow ----------
 
@@ -44,7 +36,6 @@ def run_booking() -> bool:
     - receipt + points update + history
     """
     try:
-        logger.info("Starting booking")
         guest_name = prompt_guest_name()
         num_guests = prompt_num_guests()
         apartment_id = prompt_existing_apartment_id()
@@ -188,15 +179,15 @@ def run_booking() -> bool:
             },
         )
         print(f"\n[Info] Guest '{guest_name}' now has {new_balance} reward points.")
-        logger.info("Booking completed")
+
         return True
 
     except KeyboardInterrupt:
         print("\nBooking cancelled by user.")
-        logger.info("Booking cancelled by user")
+    
         raise
     except Exception as e:
-        logger.error("Booking error: %s", e)
+     
         print("Booking failed:", e)
         return False
 
@@ -275,13 +266,13 @@ def run_once() -> None:
             # user terminate
             elif choice == "7":
                 print("Goodbye!")
-                logger.info("Application terminated by user")
+             
                 return
             else:
                 print("Please choose 1–7.")
         except KeyboardInterrupt:
             print("\nGoodbye!")
-            logger.info("Application terminated by user")
+      
             return
 
 
@@ -289,7 +280,7 @@ def main() -> None:
     try:
         run_once()
     except Exception as e:
-        logger.error("Fatal error: %s", e)
+
         print(f"Fatal error: {e}")
         sys.exit(1)
 

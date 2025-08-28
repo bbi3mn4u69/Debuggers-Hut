@@ -8,7 +8,7 @@ A professional Python application for managing hotel apartment bookings and gues
 - **Reward Points System**: Track and award points to guests based on spending
 - **Receipt Generation**: Generate formatted receipts for bookings
 - **Input Validation**: Comprehensive validation for all user inputs
-- **Logging**: Detailed logging for debugging and monitoring
+
 - **Error Handling**: Robust error handling with user-friendly messages
 
 ## Project Structure
@@ -159,13 +159,6 @@ Calculate reward points with half-up rounding.
 - **Integration Tests**: Test module interactions
 - **Error Handling**: Test error conditions and edge cases
 
-### Logging
-
-The application uses Python's built-in logging module with:
-
-- **Console Output**: Real-time application logs
-- **File Output**: Persistent logs in `hotel_booking.log`
-- **Configurable Levels**: DEBUG, INFO, WARNING, ERROR
 
 ## Contributing
 

@@ -13,7 +13,6 @@
 
 \title{The Pythonian Hut Program\\
 {\footnotesize Professional Reflection}
-\thanks{Identify applicable funding agency here. If none, delete this.}
 }
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Nguyen Quang Huy Pham}
@@ -21,7 +20,6 @@
 \textit{Sid:4181834}\\
 Melbourne, Autralia \\
 s4181834@student.rmit.edu.au}
-
 }
 
 \maketitle
@@ -32,15 +30,13 @@ s4181834@student.rmit.edu.au}
 \section{Program Design}
 \subsection{Part 1 - Basic Booking Flow}
 \subsubsection{Prompts and Variable Storage}
-The program prompt user for guest name, number of guests, apartment ID, check in and check out date, length of stay and booking date. All of the input is validated such as the guest input can not be empty, number of guest must be integer. All of the Variables are stored and passes to the booking process. This has meet the rubic with clear message and minor limitation no consistency check between dates and length of stay 
+The program have successfully implement all the required feature of user prompts for guest name, number of guest, apartment ID, checkin date, checkout date, length of stay, and booking date. Each entry is captured from the user keyboard input and stored in the appropriate variable type. All the input have its own validation that ensure such common error like leaving the field blank or miss match input type will trigger a clear error messages to the user. This design guarantees robust data collection at the earliest stage of the booking process.
 \subsubsection{Data Types and Initialization}
-The data type and inilization is clearly defined in the code base. Guest and point are stored in dictionary \textbf{picture}. Apartment and rates stored in dictionary \textbf{picture}. The program first initialize with the required data as assignment details (Alyssa (20), Luigi (32)) and three apartments with nightly rates. The program have implemented a good use of data type, only with the minor issue when using StorageManager, new guest are not auto-added
+Guest details and apartment information are stored in a dictionaries for efficient lookups and update. Speciffically, guest name maps to thier own reward point and apartment id maps to its own nightly rates. The system initialize based on the assingment requirement with two existing guest Alyssa (20 points) and Luigi (32 points), along with three apartments (U12swan, U209duck, and U49goose) and their respective nightly rates.
 \subsubsection{Cost and Rewards Caculation}
-The cost and reward caculation follow stricly based on the assignment details, cost = nightly rates x length of stay. Rewards = total cost rounded half-up to the nearest integer.
+Align with the requirement of the assignment, the systemm calculates the total booking cost by multiplying the apartment's nightly rate by the length of stay. Reward points are awarded based on the total cost in AUD using a half-up rounding method.
 \subsubsection{Receipt Formatting}
-The receipt prints all required details including guest, number of guest, apartment, rate, check in and check put date, nights, booking date, total cost and reward points. The format is clear and consistent with the assignment specification with AUD currency shown to 2 decimals
-\subsubsection{Beyond Requirement Features}
-The logging to file and stdout, storage manager with add/update/delete operations. Also there is a interactive booking loop 
+A biingling reciept is generated and displaed at the end of each booking process. The reciept inclued all of the required field  guest name, number of guests, apartment ID, apartment rate (AUD with two decimal places), check-in date, check-out date, length of stay, booking date, total cost, and reward points earned. The receipt formatting is clear and user-friendly, closely mirroring the layout provided in the assignment specification.
 \subsection{Functional Requirements}
 
 \subsection{Data Structures}

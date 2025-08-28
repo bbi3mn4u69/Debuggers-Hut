@@ -97,3 +97,39 @@ def calculate_final_cost(original_cost: float, discount_amount: float = 0.0) -> 
     
     final_cost = original_cost - discount_amount
     return max(0, final_cost)  # Ensure cost doesn't go below zero
+
+
+def calc_items_subtotal(items_with_qty: dict[str, int], price_lookup: dict[str, float]) -> float:
+    """
+    Sum item costs: sum(qty * price). Missing ids assumed invalid by caller.
+    """
+    total = 0.0
+    for iid, qty in items_with_qty.items():
+        price = float(price_lookup[iid])
+        total += price * int(qty)
+    return total
+
+def required_extra_beds(num_guests: int, capacity: int) -> int:
+    """
+    Compute extra beds needed so that capacity + beds*2 >= num_guests.
+    Cap at 2 beds; caller decides feasibility.
+    """
+    if num_guests <= capacity:
+        return 0
+    deficit = num_guests - capacity
+    beds = (deficit + 1) // 2  # ceil(deficit/2)
+    return min(2, beds)
+
+def apply_points_redemption(pre_total: float, guest_points: int, redeem_blocks: int) -> tuple[float, int]:
+    """
+    Apply redemption in blocks of 100 pts -> $10 per block.
+    Returns (final_total, points_spent). Earned points are still based on pre_total.
+    """
+    if redeem_blocks < 0:
+        redeem_blocks = 0
+    # max blocks allowed by balance and by pre_total
+    max_by_points = guest_points // 100
+    max_by_total = int(pre_total // 10)
+    spend_blocks = min(redeem_blocks, max_by_points, max_by_total)
+    discount = spend_blocks * 10.0
+    return max(0.0, pre_total - discount), spend_blocks * 100

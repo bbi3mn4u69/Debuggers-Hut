@@ -3,7 +3,6 @@ User input handling and validation for the Hotel Booking System (Part 2).
 """
 
 import logging
-from datetime import datetime
 
 from .config import DATE_FORMAT
 from .data_store import list_apartments, list_items
@@ -70,11 +69,37 @@ def prompt_apartment_id() -> str:
             raise
 
 def _validate_date(date_str: str) -> bool:
-    try:
-        datetime.strptime(date_str, _DATETIME_FORMAT)
-        return True
-    except ValueError:
+    """
+    Validate Australian date format d/m/yyyy without using datetime.
+    Accepts 1-2 digit day, 1-2 digit month, and 4-digit year (>= 1900).
+    Checks day limits per month and leap years.
+    """
+    s = date_str.strip()
+    # Basic structure: a/b/c where c is 4 digits
+    parts = s.split("/")
+    if len(parts) != 3:
         return False
+    d_s, m_s, y_s = parts[0].strip(), parts[1].strip(), parts[2].strip()
+    if not (d_s.isdigit() and m_s.isdigit() and y_s.isdigit() and len(y_s) == 4):
+        return False
+    d, m, y = int(d_s), int(m_s), int(y_s)
+    if y < 1900:  # arbitrary lower bound
+        return False
+    if not (1 <= m <= 12):
+        return False
+
+    # days per month
+    month_days = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
+
+    # leap year adjustment
+    is_leap = (y % 4 == 0 and (y % 100 != 0 or y % 400 == 0))
+    if m == 2 and is_leap:
+        max_day = 29
+    else:
+        max_day = month_days[m]
+
+    return 1 <= d <= max_day
+
 
 def prompt_checkin() -> str:
     while True:

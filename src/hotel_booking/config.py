@@ -11,7 +11,7 @@ APARTMENTS = {
 
 # Existing guests and their accumulated reward points
 GUESTS_POINTS = {
-    "Alyssa": 20,
+    "Alyssa": 300,
     "Luigi": 32,
 }
 

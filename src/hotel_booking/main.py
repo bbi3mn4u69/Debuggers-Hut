@@ -48,6 +48,10 @@ def run_booking() -> bool:
         guest_name = prompt_guest_name()
         num_guests = prompt_num_guests()
         apartment_id = prompt_existing_apartment_id()
+        # part 3 
+        rate = get_rate(apartment_id)
+        print(f"Rate for {apartment_id}: ${rate:.2f} per night")
+        
         checkin = prompt_checkin()
         checkout = prompt_checkout()
         nights = prompt_nights_1_to_7()
@@ -85,6 +89,9 @@ def run_booking() -> bool:
 
         while continue_ordering:
             iid = prompt_item_id_existing()
+            unit_price = items_catalog[iid]
+            print(f"Price for {iid}: ${unit_price:.2f}")
+           
             qty = prompt_quantity_positive()
 
             if not iid or qty is None or qty <= 0:
@@ -120,19 +127,25 @@ def run_booking() -> bool:
         discount_amount = 0.0
         spent_points = 0
         final_total = pre_total
-
+        
         if current_pts >= 100 and pre_total >= 10 and prompt_yes_no(
-            f"You have {current_pts} points. Redeem now? (100pts = $10)"
-        ):
+        f"You have {current_pts} points. Redeem now? (100pts = $10)"):
+            max_blocks = min(current_pts // 100, int(pre_total // 10))
+            print(f"You can redeem up to {max_blocks} block(s) of 100 points "
+                    f"({max_blocks*100} pts = ${max_blocks*10}).")
+
             while True:
                 try:
                     blocks = int(input("Enter how many 100-point blocks to redeem: ").strip())
-                    final_total, spent_points = apply_points_redemption(pre_total, current_pts, blocks)
-                    discount_amount = pre_total - final_total
-                    break
+                    if 0 <= blocks <= max_blocks:
+                        final_total, spent_points = apply_points_redemption(pre_total, current_pts, blocks)
+                        discount_amount = pre_total - final_total
+                        break
+                    else:
+                        print(f"Error: please enter a number between 0 and {max_blocks}.")
                 except ValueError:
-                    print("Error: enter a whole number of blocks.")
-
+                    print("Error: enter a whole number.")
+                    
         earned = points_round_half_up(pre_total)  # earned from pre-discount total
 
         # Print receipt (with optional supplementary section)

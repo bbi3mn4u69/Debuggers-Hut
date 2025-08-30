@@ -41,8 +41,17 @@ The cost and reward caculation follow stricly based on the assignment details, c
 The receipt prints all required details including guest, number of guest, apartment, rate, check in and check put date, nights, booking date, total cost and reward points. The format is clear and consistent with the assignment specification with AUD currency shown to 2 decimals
 \subsubsection{Beyond Requirement Features}
 The logging to file and stdout, storage manager with add/update/delete operations. Also there is a interactive booking loop 
-\subsection{Functional Requirements}
+\subsection{Part 2 - Menu \& Supplementary Items}
+\subsubsection{Functional Requirement}
+The program have shown a numbered menu and re-displays it after each task and implemented run\_once() a while loop menu. All of the options in the menu align closely with the spec's list including (1) Make a booking, (2) Add/Update apartment, (3) Add/Update supplementary items (bulk), (4) Display guests, (5) Display products. User now can make a booking flow with extended supplementary items can be added to their reciept. After an apartment is selected, the system offer supplementary items repeatedly until the user answer is no. Each Item capture thier ID and quantity, per-item cost = price x qty. The the supplementary subtotal is computed and shown in the receipt as required. The functional also include the update entries with aparment: one line apartment\_id rate capacity, validated against the U + digits + name pattern and applied as an upsert. Supplementary items can add a single item. In addition, a option to display existing data with guest, apartments and items information. The guest list will show each guest with accumulated points, aparment list will show each unit with rate and capacity and supplementary list showns each item with price.
+\subsubsection{Data Structures}
+For apartments, a dictionary is created with apartment\_id => {"rate": float, "capacity": int} initialised with U12swan (95.0, cap 2), U209duck (106.7, cap 2), U49goose (145.2, cap 2), matching the spec. Capacity default is 2 (explicitly stored), per spec.
+For supplementary items a dictionary item\_id => price is initialised with car\_park (25), breakfast (21), toothpaste (5), extra\_bed (50)
+For guest and reward points a dictionary guest\_name => points is initialised  with Alyssa (20), Luigi (32).
+For orders history (beyond Part-2): mapping guest => [order\_summaries] that stores apartment, items, totals, and earned points.
 
+\subsubsection{Input Validation}
+The input validation stayed the same with part 1 mostly but there is a few changes. For numberic fields, the nights prompt the guest to select from 1 - 7 and Supplementary items: when ordering, item ID must exist. Any invalid invalid input leads the user to menu again and trigger the menu loop until the input is valided
 \subsection{Data Structures}
 
 \subsection{Input Validation}

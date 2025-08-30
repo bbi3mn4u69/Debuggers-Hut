@@ -17,94 +17,60 @@
 }
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Nguyen Quang Huy Pham}
-\IEEEauthorblockA{\textit{Royal Melbourne Insitue of Technology} \\
+\IEEEauthorblockA{\textit{Royal Melbourne Institute of Technology} \\
 \textit{Sid:4181834}\\
-Melbourne, Autralia \\
+Melbourne, Australia \\
 s4181834@student.rmit.edu.au}
 
 }
 
 \maketitle
 
-\section{Introduction}
-
-
 \section{Program Design}
 \subsection{Part 1 - Basic Booking Flow}
 \subsubsection{Prompts and Variable Storage}
-The program prompt user for guest name, number of guests, apartment ID, check in and check out date, length of stay and booking date. All of the input is validated such as the guest input can not be empty, number of guest must be integer. All of the Variables are stored and passes to the booking process. This has meet the rubic with clear message and minor limitation no consistency check between dates and length of stay 
-\subsubsection{Data Types and Initialization}
-The data type and inilization is clearly defined in the code base. Guest and point are stored in dictionary \textbf{picture}. Apartment and rates stored in dictionary \textbf{picture}. The program first initialize with the required data as assignment details (Alyssa (20), Luigi (32)) and three apartments with nightly rates. The program have implemented a good use of data type, only with the minor issue when using StorageManager, new guest are not auto-added
-\subsubsection{Cost and Rewards Caculation}
-The cost and reward caculation follow stricly based on the assignment details, cost = nightly rates x length of stay. Rewards = total cost rounded half-up to the nearest integer.
+The program prompt the user for guest name, number of guests, apartment ID, check-in and check out date, length of stay and booking date. All of the input is validated such as the guest input can not be empty, and the number of guests must be an integer. All of the Variables are stored and passes to the booking process. This has met the rubric with a clear message and minor limitations no consistency check between dates and length of stay 
+\subsubsection{Data Types and Initialisation}
+The data type and initialisation are clearly defined in the code base. Guest and point are stored in the dictionary \textbf{picture}. Apartment and rates stored in dictionary \textbf{picture}. The program first initialize with the required data as assignment details (Alyssa (20), Luigi (32)) and three apartments with nightly rates. The program has implemented a good use of data types.
+\subsubsection{Cost and Rewards Calculation}
+The cost and reward calculation follows strictly based on the assignment details, cost = nightly rates x length of stay. Rewards = total cost rounded half-up to the nearest integer.
 \subsubsection{Receipt Formatting}
-The receipt prints all required details including guest, number of guest, apartment, rate, check in and check put date, nights, booking date, total cost and reward points. The format is clear and consistent with the assignment specification with AUD currency shown to 2 decimals
-\subsubsection{Beyond Requirement Features}
-The logging to file and stdout, storage manager with add/update/delete operations. Also there is a interactive booking loop 
+The receipt prints all required details, including guest, number of guest, apartment, rate, check in and check put date, nights, booking date, total cost and reward points. The format is clear and consistent with the assignment specification, with AUD currency shown to 2 decimals
+
 \subsection{Part 2 - Menu \& Supplementary Items}
 \subsubsection{Functional Requirement}
-The program have shown a numbered menu and re-displays it after each task and implemented run\_once() a while loop menu. All of the options in the menu align closely with the spec's list including (1) Make a booking, (2) Add/Update apartment, (3) Add/Update supplementary items (bulk), (4) Display guests, (5) Display products. User now can make a booking flow with extended supplementary items can be added to their reciept. After an apartment is selected, the system offer supplementary items repeatedly until the user answer is no. Each Item capture thier ID and quantity, per-item cost = price x qty. The the supplementary subtotal is computed and shown in the receipt as required. The functional also include the update entries with aparment: one line apartment\_id rate capacity, validated against the U + digits + name pattern and applied as an upsert. Supplementary items can add a single item. In addition, a option to display existing data with guest, apartments and items information. The guest list will show each guest with accumulated points, aparment list will show each unit with rate and capacity and supplementary list showns each item with price.
+The program have shown a numbered menu and re-displays it after each task, and implemented run\_once() a while loop menu. All of the options in the menu align closely with the spec's list, including (1) Make a booking, (2) Add/Update apartment, (3) Add/Update supplementary items (bulk), (4) Display guests, (5) Display products. User can now make a booking flow with extended supplementary items that can be added to their receipt. After an apartment is selected, the system offer supplementary items repeatedly until the user's answer is no. Each Item capture thier ID and quantity, per-item cost = price x qty. The supplementary subtotal is computed and shown in the receipt as required. The functional also include the update entries with aparment: one line apartment\_id rate capacity, validated against the U + digits + name pattern and applied as an upsert. Supplementary items can add a single item. In addition, an option to display existing data with guest, apartments and items information. The guest list will show each guest with accumulated points, aparment list will show each unit with rate and capacity, and the supplementary list showns each item with price.
 \subsubsection{Data Structures}
 For apartments, a dictionary is created with apartment\_id => {"rate": float, "capacity": int} initialised with U12swan (95.0, cap 2), U209duck (106.7, cap 2), U49goose (145.2, cap 2), matching the spec. Capacity default is 2 (explicitly stored), per spec.
-For supplementary items a dictionary item\_id => price is initialised with car\_park (25), breakfast (21), toothpaste (5), extra\_bed (50)
-For guest and reward points a dictionary guest\_name => points is initialised  with Alyssa (20), Luigi (32).
+For supplementary items, a dictionary item\_id => price is initialised with car\_park (25), breakfast (21), toothpaste (5), extra\_bed (50)
+For guest and reward points, a dictionary guest\_name => points is initialised with Alyssa (20), Luigi (32).
 For orders history (beyond Part-2): mapping guest => [order\_summaries] that stores apartment, items, totals, and earned points.
 
 \subsubsection{Input Validation}
-The input validation stayed the same with part 1 mostly but there is a few changes. For numberic fields, the nights prompt the guest to select from 1 - 7 and Supplementary items: when ordering, item ID must exist. Any invalid invalid input leads the user to menu again and trigger the menu loop until the input is valided
-\subsection{Data Structures}
-
-\subsection{Input Validation}
+The input validation stayed the same with part 1 mostly, but there is a few changes. For numeric fields, the nights prompt the guest to select from 1 - 7 and Supplementary items. When ordering, the item ID must exist. Any invalid input leads the user to the menu again and triggers the menu loop until the input is valid
+\subsection{Part 3 - Advanced Feature}
+\subsubsection{Functional Requirement}
+Based on the assignment details, an auto-display of prices during booking and ordering is added. After entering an apartment id, the rate per night of that apartment is shown immediately. Also, during supplementary ordering, the item price is shown immediately after the item ID is entered. The program is also capable of checking the capacity of the user against the aparment's bed capacity. If the number of guest exceeds capacity, the program warn and offer extra beds that add 2 more capacity if its still insufficient, the booking abort for that customer. In addition, when beds are added, the charge per night changes to align with the ordered items. Meanwhile, reward points redemptions of the guest is also implemeted. If the guest has more than or equal to 100 points, the program allows the guest to redeem them in a block of 100 points (each equal to \$10) and calculated on the pre-discount total and updates the remaining points balance. The bulk add/update if supplementary items is added to the programs allows the user to upsert multiple items by a comma-separated list; this list will be rejected if the entire line contains invalid input. Finally, adds an option to show booking history by guest with a list, total, and earned rewards for each order.
+\subsubsection{Data Structures}
+The data structure stay consistent though part 1 and part 2, with added Order history: \_orders\_by\_guest: guest => [orders] — used by the history option (Part-3).
+\subsubsection{Input Validation}
+The input validation stayed the same with part 1 and part 2 mostly, but there is a few changes. For the capacity rule, we can add an extra bed to max 2 via and abort if still insufficient — with clear messages.
+For bulk upsert validation, any bad price or malformed pair causes a ValueError, prompting the caller to re-enter the whole line. For point redemption: the program computes max redeemable blocks from both points and the pre-discount total to avoid negative totals, then applies; exceptions are handled at I/O boundaries.
 
 \section{Flowchart}
 
-\section{Implemetation Highlight}
-
-\section{Testing \& Result}
-
 \section{Reflection}
-
-
-
+\subsection{Professional Reflection}
+By completing this assignment, I have gained a deeper understanding of procedural programming in Python, how to structure code, initialise variables, design the program flow and use dictionaries. Designing the menu-driven interface taught me how to reuse code effectively across different tasks and how to separate input, processing, and output clearly. One of my key designs is to use the dictionaries for storing guests, apartments and supplementary items. This provided the program with a fast lookup and easy update. This is crucial for the reward point handling and updating the apartment or item price. I also learned the importance of moving from easy task to the hard ones, making sure it's aligned with the logic and easy to spot any bugs that occur in the way.
+\subsection{Challenging}
+The challenge I find its the toughest is to implement the extra bed capacity extension that required careful handing of constraints. Besides that, the reward point redemption also needs to calculate correctly, deduct after the total, but still grant earned points on the discount total.
 \section*{Acknowledgment}
+In the process of completing this assignment, I have used AI to assist me in understanding the assignment and refining certain implementation choices. AI is also being used to cross-check my code, to make sure it doesn't have any errors. 
 
-The preferred spelling of the word ``acknowledgment'' in America is without 
-an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
-G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
-acknowledgments in the unnumbered footnote on the first page.
 
 \section*{References}
 
-Please number citations consecutively within brackets \cite{b1}. The 
-sentence punctuation follows the bracket \cite{b2}. Refer simply to the reference 
-number, as in \cite{b3}---do not use ``Ref. \cite{b3}'' or ``reference \cite{b3}'' except at 
-the beginning of a sentence: ``Reference \cite{b3} was the first $\ldots$''
 
-Number footnotes separately in superscripts. Place the actual footnote at 
-the bottom of the column in which it was cited. Do not put footnotes in the 
-abstract or reference list. Use letters for table footnotes.
 
-Unless there are six authors or more give all authors' names; do not use 
-``et al.''. Papers that have not been published, even if they have been 
-submitted for publication, should be cited as ``unpublished'' \cite{b4}. Papers 
-that have been accepted for publication should be cited as ``in press'' \cite{b5}. 
-Capitalize only the first word in a paper title, except for proper nouns and 
-element symbols.
-
-For papers published in translation journals, please give the English 
-citation first, followed by the original foreign-language citation \cite{b6}.
-
-\begin{thebibliography}{00}
-\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
-\end{thebibliography}
 \vspace{12pt}
-\color{red}
-IEEE conference templates contain guidance text for composing and formatting conference papers. Please ensure that all template text is removed from your conference paper prior to submission to the conference. Failure to remove the template text from your paper may result in your paper not being published.
-
 \end{document}

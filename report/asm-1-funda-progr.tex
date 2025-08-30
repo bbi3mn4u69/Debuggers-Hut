@@ -37,11 +37,17 @@ Guest details and apartment information are stored in a dictionaries for efficie
 Align with the requirement of the assignment, the systemm calculates the total booking cost by multiplying the apartment's nightly rate by the length of stay. Reward points are awarded based on the total cost in AUD using a half-up rounding method.
 \subsubsection{Receipt Formatting}
 A biingling reciept is generated and displaed at the end of each booking process. The reciept inclued all of the required field  guest name, number of guests, apartment ID, apartment rate (AUD with two decimal places), check-in date, check-out date, length of stay, booking date, total cost, and reward points earned. The receipt formatting is clear and user-friendly, closely mirroring the layout provided in the assignment specification.
-\subsection{Functional Requirements}
-
-\subsection{Data Structures}
 
 \subsection{Input Validation}
+The inputs are being checked everytime the user enter their data with the following validation 
+\begin{itemize}
+    \item Guest name: cannot be blank, restricted to alphabetic,
+    \item Number of guest: must be positive interger
+    \item Apartment ID: must start with “u” followed by number + building .
+    \item Dates: prompted in d/m/yyyy format (stored as string, not validated further).
+    \item Length of stay: must be positive integer.
+    \item All the date: required, not blank, must be valid date.
+\end{itemize}
 
 \section{Flowchart}
 

@@ -1,4 +1,10 @@
 
+"""
+Nguyen Quang Huy Pham 
+s4181834
+Attempted All 3 Tasks
+"""
+
 import sys
 from typing import Dict, Any
 """

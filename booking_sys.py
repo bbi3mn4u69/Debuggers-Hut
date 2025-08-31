@@ -1,27 +1,21 @@
 
 import sys
+from typing import Dict, Any
 """
 CONFIG
 """
-# Apartments now include capacity (beds). Default capacity is 2.
 APARTMENTS = {
     "U12swan":  {"rate": 95.0,  "capacity": 2},
     "U209duck": {"rate": 106.7, "capacity": 2},
     "U49goose": {"rate": 145.2, "capacity": 2},
 }
 
-# Existing guests and their accumulated reward points
 GUESTS_POINTS = {
     "Alyssa": 300,
     "Luigi": 32,
 }
 
-# Default supplementary items (id -> price)
-# Notes:
-# - car_park: per night
-# - breakfast: per person
-# - toothpaste: per tube
-# - extra_bed: per bed per night
+
 SUPPLEMENTARY_ITEMS = {
     "car_park":   25.0,
     "breakfast":  18.0,
@@ -29,7 +23,6 @@ SUPPLEMENTARY_ITEMS = {
     "extra_bed":  30.0,
 }
 
-# Application settings
 HOTEL_NAME = "Debuggers Hut Serviced Apartments"
 CURRENCY = "AUD"
 DATE_FORMAT = "d/m/yyyy"
@@ -37,20 +30,18 @@ DATE_FORMAT = "d/m/yyyy"
 """
 DATA STORAGE
 """
-from typing import Dict, Any
 
 
-
-# In-memory stores
+# in-memory stores
 _guests_points: Dict[str, int] = GUESTS_POINTS.copy()
 _apartments: Dict[str, Dict[str, Any]] = {k: dict(v) for k, v in APARTMENTS.items()}
 _items: Dict[str, float] = SUPPLEMENTARY_ITEMS.copy()
 
-# Order history: guest -> list of order dicts
+# order history: guest -> list of order dicts
 _orders_by_guest: Dict[str, list] = {}
 
 
-# ---------- Listing / viewing ----------
+# ---------- listing and viewing ----------
 
 def list_apartments() -> Dict[str, Dict[str, Any]]:
     """Return copy of apartments (id -> {rate, capacity})."""
@@ -68,8 +59,6 @@ def get_all_guests() -> Dict[str, int]:
     """Copy of guests and their points."""
     return dict(_guests_points)
 
-
-# ---------- Lookups ----------
 
 def get_rate(apartment_id: str) -> float:
     """Nightly rate for id (case-insensitive); 0.0 if not found."""
@@ -89,7 +78,7 @@ def get_capacity(apartment_id: str) -> int:
     return 0
 
 
-# ---------- Guests & Points ----------
+# ---------- guest and point ----------
 
 def add_points(guest_name: str, earned: int) -> int:
     """Add positive points for guest (create if new). Returns new total."""
@@ -119,45 +108,24 @@ def get_guest_points(guest_name: str) -> int:
     return _guests_points.get(guest_name, 0)
 
 
-# ---------- Admin upserts ----------
+# ---------- upsert part ----------
 
 def _is_valid_apartment_id(apartment_id: str) -> bool:
-    """
-    Validate apartment id format:
-      - Starts with 'U'
-      - Followed by at least one digit
-      - Followed by at least one letter (building name)
-      - Remaining characters (if any) must be letters or digits
-    Examples: U12swan ✅, U209duck ✅, Uswan ❌, U12_swan ❌
-    """
     if not apartment_id or apartment_id[0] != "U":
         return False
-
-    # Find where the digits end
     i = 1
     while i < len(apartment_id) and apartment_id[i].isdigit():
         i += 1
-
-    # Must have at least one digit
     if i == 1:
         return False
-
-    # Must have at least one letter after the digits
     if i >= len(apartment_id) or not apartment_id[i].isalpha():
         return False
-
-    # Remaining characters (if any) must be alphanumeric
     for ch in apartment_id[i:]:
         if not ch.isalnum():
             return False
-
     return True
 
-
 def upsert_apartment(apartment_id: str, rate: float, capacity: int) -> None:
-    """
-    Add/update apartment with validation: U + digits + name (e.g., U12swan).
-    """
     if not _is_valid_apartment_id(apartment_id):
         raise ValueError("Invalid apartment id format (e.g., U12swan)")
     if rate <= 0:
@@ -169,9 +137,8 @@ def upsert_apartment(apartment_id: str, rate: float, capacity: int) -> None:
 
 def upsert_items_bulk(line: str) -> None:
     """
-    Add/update multiple items from a line like:
+    we can upsert bulk of item by the following syntax:
       'toothpaste 5.2, shampoo 8.2'
-    If any price invalid -> raise ValueError so caller can re-prompt the whole line.
     """
     if not line.strip():
         raise ValueError("Empty input")
@@ -191,41 +158,18 @@ def upsert_items_bulk(line: str) -> None:
         changes[iid] = price
     _items.update(changes)
 
-
-
-# ---------- Order history ----------
+# ---------- order history ----------
 
 def record_order(guest: str, summary: dict) -> None:
-    """
-    Append an order summary for a guest.
-    Keys (expected):
-      apartment_id, nights, items(dict id->qty),
-      pre_total, redeemed_points, final_total, earned_points
-    """
     _orders_by_guest.setdefault(guest, []).append(summary)
-
 def get_orders_for_guest(guest: str) -> list:
     return list(_orders_by_guest.get(guest, []))
-
 
 """
 CACULATION
 """
 
 def compute_total_cost(rate: float, nights: int) -> float:
-    """
-    Calculate total cost for a booking.
-    
-    Args:
-        rate: Nightly rate in AUD
-        nights: Number of nights
-        
-    Returns:
-        float: Total cost in AUD
-        
-    Raises:
-        ValueError: If rate or nights are negative
-    """
     if rate < 0:
         raise ValueError("Rate cannot be negative")
     
@@ -237,21 +181,6 @@ def compute_total_cost(rate: float, nights: int) -> float:
 
 
 def points_round_half_up(amount_aud: float) -> int:
-    """
-    Calculate reward points with half-up rounding.
-    
-    Reward points: 1 point per dollar, rounded to nearest integer with HALF-UP rule.
-    Examples: 599.50 -> 600, 350.4 -> 350.
-    
-    Args:
-        amount_aud: Amount in AUD
-        
-    Returns:
-        int: Number of reward points earned
-        
-    Raises:
-        ValueError: If amount is negative
-    """
     if amount_aud < 0:
         raise ValueError("Amount cannot be negative")
     
@@ -282,16 +211,6 @@ def calculate_discount(original_cost: float, discount_percentage: float) -> floa
 
 
 def calculate_final_cost(original_cost: float, discount_amount: float = 0.0) -> float:
-    """
-    Calculate final cost after applying discount.
-    
-    Args:
-        original_cost: Original cost in AUD
-        discount_amount: Discount amount in AUD
-        
-    Returns:
-        float: Final cost in AUD
-    """
     if original_cost < 0:
         raise ValueError("Original cost cannot be negative")
     
@@ -303,9 +222,6 @@ def calculate_final_cost(original_cost: float, discount_amount: float = 0.0) -> 
 
 
 def calc_items_subtotal(items_with_qty: dict[str, int], price_lookup: dict[str, float]) -> float:
-    """
-    Sum item costs: sum(qty * price). Missing ids assumed invalid by caller.
-    """
     total = 0.0
     for iid, qty in items_with_qty.items():
         price = float(price_lookup[iid])
@@ -313,10 +229,6 @@ def calc_items_subtotal(items_with_qty: dict[str, int], price_lookup: dict[str, 
     return total
 
 def required_extra_beds(num_guests: int, capacity: int) -> int:
-    """
-    Compute extra beds needed so that capacity + beds*2 >= num_guests.
-    Cap at 2 beds; caller decides feasibility.
-    """
     if num_guests <= capacity:
         return 0
     deficit = num_guests - capacity
@@ -324,10 +236,6 @@ def required_extra_beds(num_guests: int, capacity: int) -> int:
     return min(2, beds)
 
 def apply_points_redemption(pre_total: float, guest_points: int, redeem_blocks: int) -> tuple[float, int]:
-    """
-    Apply redemption in blocks of 100 pts -> $10 per block.
-    Returns (final_total, points_spent). Earned points are still based on pre_total.
-    """
     if redeem_blocks < 0:
         redeem_blocks = 0
     # max blocks allowed by balance and by pre_total
@@ -337,14 +245,10 @@ def apply_points_redemption(pre_total: float, guest_points: int, redeem_blocks: 
     discount = spend_blocks * 10.0
     return max(0.0, pre_total - discount), spend_blocks * 100
 
-
-
 """
 RECEIPT PRINTING
 """
-
 LINE = "=" * 57
-
 
 def print_receipt(
     guest_name: str,
@@ -361,9 +265,6 @@ def print_receipt(
     supp_items: list[tuple[str, int, float]] | None = None,  # (id, qty, price)
     supp_subtotal: float | None = None,
 ) -> None:
-    """
-    Print a formatted booking receipt with optional supplementary items section.
-    """
     try:
         print(LINE)
         print(f"               {HOTEL_NAME} - Booking Receipt")
@@ -379,7 +280,6 @@ def print_receipt(
         print(f"Booking date:  {booking_date}")
         print("-" * 80)
 
-        # Supplementary items (only if present)
         if supp_items:
             print("Supplementary items")
             for iid, qty, price in supp_items:
@@ -400,17 +300,11 @@ def print_receipt(
         print(f"Earned rewards:        {reward_points} (points)\n")
         print("Thank you for your booking! We hope you will have an enjoyable stay.")
         print(LINE)
-
-     
-
     except Exception as e:
-  
         print("Error: Could not print receipt properly.")
-
 
 def format_currency(amount: float) -> str:
     return f"${amount:.2f} ({CURRENCY})"
-
 
 """
 IO PROMPT
@@ -429,13 +323,11 @@ def prompt_guest_name() -> str:
             if len(name) > 100:
                 print("Error: Guest name is too long. Please use a shorter name.")
                 continue
-         
             return name
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
             raise
         except Exception as e:
-           
             print("An error occurred. Please try again.")
 
 def prompt_num_guests() -> int:
@@ -466,7 +358,6 @@ def prompt_apartment_id() -> str:
             if len(apartment_id) > 20:
                 print("Error: Apartment ID is too long.")
                 continue
-           
             return apartment_id
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
@@ -474,12 +365,9 @@ def prompt_apartment_id() -> str:
 
 def _validate_date(date_str: str) -> bool:
     """
-    Validate Australian date format d/m/yyyy without using datetime.
-    Accepts 1-2 digit day, 1-2 digit month, and 4-digit year (>= 1900).
-    Checks day limits per month and leap years.
+    validate the date
     """
     s = date_str.strip()
-    # Basic structure: a/b/c where c is 4 digits
     parts = s.split("/")
     if len(parts) != 3:
         return False
@@ -487,23 +375,17 @@ def _validate_date(date_str: str) -> bool:
     if not (d_s.isdigit() and m_s.isdigit() and y_s.isdigit() and len(y_s) == 4):
         return False
     d, m, y = int(d_s), int(m_s), int(y_s)
-    if y < 1900:  # arbitrary lower bound
+    if y < 1900: 
         return False
     if not (1 <= m <= 12):
         return False
-
-    # days per month
     month_days = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-
-    # leap year adjustment
     is_leap = (y % 4 == 0 and (y % 100 != 0 or y % 400 == 0))
     if m == 2 and is_leap:
         max_day = 29
     else:
         max_day = month_days[m]
-
     return 1 <= d <= max_day
-
 
 def prompt_checkin() -> str:
     while True:
@@ -515,7 +397,6 @@ def prompt_checkin() -> str:
             if not _validate_date(checkin):
                 print(f"Error: Invalid date. Use {DATE_FORMAT}.")
                 continue
-         
             return checkin
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
@@ -565,14 +446,12 @@ def prompt_booking_date() -> str:
             if not _validate_date(booking_date):
                 print(f"Error: Invalid date. Use {DATE_FORMAT}.")
                 continue
-            
             return booking_date
         except KeyboardInterrupt:
             print("\nOperation cancelled by user.")
             raise
 
-
-# ---------- Part 2 additions ----------
+# ---------- prompt yes/no ----------
 
 def prompt_yes_no(msg: str) -> bool:
     while True:
@@ -584,7 +463,6 @@ def prompt_yes_no(msg: str) -> bool:
         print("Error: please enter y or n.")
 
 def prompt_existing_apartment_id() -> str:
-    """Prompt until the id exists (case-insensitive)."""
     aps = list_apartments()
     while True:
         aid = prompt_apartment_id()
@@ -626,10 +504,6 @@ def prompt_quantity_positive(max_allowed: int | None = None) -> int:
             print("Error: please enter a whole number.")
 
 def prompt_upsert_apartment_line() -> tuple[str, float, int]:
-    """
-    Expect: apartment_id rate capacity
-    ID format is validated downstream in data_store.upsert_apartment.
-    """
     while True:
         line = input("Enter: apartment_id rate capacity: ").strip()
         parts = line.split()
@@ -646,34 +520,20 @@ def prompt_upsert_apartment_line() -> tuple[str, float, int]:
             break
 
 def prompt_items_bulk_line() -> str:
-    """
-    Example: 'toothpaste 5.2, shampoo 8.2'
-    Validation of price/format occurs in data_store.upsert_items_bulk.
-    """
     return input("Enter items list (item price, item price, ...): ").strip()
-
-
 
 """
 Main application 
 """
 
-# ---------- Core booking flow ----------
+# ---------- core booking flow ----------
 
 def run_booking() -> bool:
-    """
-    One complete booking in Part 2:
-    - inputs (+ validation)
-    - capacity & extra-bed rule
-    - supplementary items flow
-    - optional reward redemption
-    - receipt + points update + history
-    """
     try:
         guest_name = prompt_guest_name()
         num_guests = prompt_num_guests()
         apartment_id = prompt_existing_apartment_id()
-        # part 3 
+        
         rate = get_rate(apartment_id)
         print(f"Rate for {apartment_id}: ${rate:.2f} per night")
         
@@ -682,7 +542,7 @@ def run_booking() -> bool:
         nights = prompt_nights_1_to_7()
         booking_date = prompt_booking_date()
 
-        # Capacity & extra bed rule
+        
         capacity = get_capacity(apartment_id)
         beds_needed = required_extra_beds(num_guests, capacity)
         extra_bed_qty = 0
@@ -690,7 +550,6 @@ def run_booking() -> bool:
             print("Warning: the number of guests exceeds the unit capacity.")
             if prompt_yes_no("Add extra bed(s)? (max 2; each adds capacity +2)"):
                 extra_bed_qty = prompt_quantity_positive(max_allowed=2)
-                # After adding beds, ensure feasible
                 if capacity + extra_bed_qty * 2 < num_guests:
                     print("Booking cannot proceed: capacity still insufficient.")
                     return False
@@ -698,15 +557,12 @@ def run_booking() -> bool:
                 print("Booking cannot proceed due to capacity.")
                 return False
 
-        # Apartment cost
         rate = get_rate(apartment_id)
         apt_cost = compute_total_cost(rate, nights)
 
-        # Supplementary items (allow multiple)
         items_catalog = list_items()
         ordered_items: dict[str, int] = {}
 
-        # If extra beds were added, charge per bed per night
         if extra_bed_qty:
             ordered_items["extra_bed"] = ordered_items.get("extra_bed", 0) + extra_bed_qty * nights
 
@@ -721,11 +577,9 @@ def run_booking() -> bool:
 
             if not iid or qty is None or qty <= 0:
                 print("Invalid item ID or quantity. Please try again.")
-                # Ask directly if they want to try another item (stay in loop or exit)
                 continue_ordering = prompt_yes_no("Do you want to order another supplementary item?")
                 continue
 
-            # Compute tentative total BEFORE saving
             tentative_items = dict(ordered_items)
             tentative_items[iid] = tentative_items.get(iid, 0) + qty
             tentative_total = calc_items_subtotal(tentative_items, items_catalog)
@@ -739,15 +593,11 @@ def run_booking() -> bool:
             else:
                 print("Item cancelled.")
 
-            # Only this prompt controls the next iteration
             continue_ordering = prompt_yes_no("Do you want to order another supplementary item?")
-
-
 
         supp_subtotal = calc_items_subtotal(ordered_items, items_catalog) if ordered_items else 0.0
         pre_total = apt_cost + supp_subtotal
 
-        # Reward redemption (100 pts -> $10; earned from pre_total)
         current_pts = get_guest_points(guest_name)
         discount_amount = 0.0
         spent_points = 0
@@ -758,7 +608,6 @@ def run_booking() -> bool:
             max_blocks = min(current_pts // 100, int(pre_total // 10))
             print(f"You can redeem up to {max_blocks} block(s) of 100 points "
                     f"({max_blocks*100} pts = ${max_blocks*10}).")
-
             while True:
                 try:
                     blocks = int(input("Enter how many 100-point blocks to redeem: ").strip())
@@ -771,12 +620,13 @@ def run_booking() -> bool:
                 except ValueError:
                     print("Error: enter a whole number.")
                     
-        earned = points_round_half_up(pre_total)  # earned from pre-discount total
+        earned = points_round_half_up(pre_total) 
 
-        # Print receipt (with optional supplementary section)
         supp_items_list = (
             [(iid, ordered_items[iid], items_catalog[iid]) for iid in ordered_items] if ordered_items else None
         )
+        
+        # print receipt
         print_receipt(
             guest_name=guest_name,
             num_guests=num_guests,
@@ -793,13 +643,11 @@ def run_booking() -> bool:
             supp_subtotal=supp_subtotal if ordered_items else None,
         )
 
-        # Update points (spend then earn)
         if spent_points:
             spend_points(guest_name, spent_points)
         add_points(guest_name, earned)
         new_balance = get_guest_points(guest_name)
 
-        # Save order history
         record_order(
             guest_name,
             {
@@ -813,20 +661,16 @@ def run_booking() -> bool:
             },
         )
         print(f"\n[Info] Guest '{guest_name}' now has {new_balance} reward points.")
-
         return True
 
     except KeyboardInterrupt:
         print("\nBooking cancelled by user.")
-    
         raise
     except Exception as e:
-     
         print("Booking failed:", e)
         return False
 
-
-# ---------- Menu ----------
+# ---------- menu ----------
 
 def run_once() -> None:
     print("Welcome to the Hotel Booking System!")
@@ -856,7 +700,7 @@ def run_once() -> None:
                     except Exception as e:
                         print("Error:", e)
                         break
-            # add/update supplementary items
+            # upsert supplementary items
             elif choice == "3":
                 while True:
                     try:
@@ -900,24 +744,21 @@ def run_once() -> None:
             # user terminate
             elif choice == "7":
                 print("Goodbye!")
-             
                 return
             else:
                 print("Please choose 1–7.")
         except KeyboardInterrupt:
             print("\nGoodbye!")
-      
             return
-
 
 def main() -> None:
     try:
         run_once()
     except Exception as e:
-
         print(f"Fatal error: {e}")
         sys.exit(1)
 
-
 if __name__ == "__main__":
     main()
+
+

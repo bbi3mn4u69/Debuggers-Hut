@@ -44,33 +44,31 @@ _orders_by_guest: Dict[str, list] = {}
 # ---------- listing and viewing ----------
 
 def list_apartments() -> Dict[str, Dict[str, Any]]:
-    """Return copy of apartments (id -> {rate, capacity})."""
+    """ copy of apartments (id -> {rate, capacity})."""
     return {k: dict(v) for k, v in _apartments.items()}
 
 def get_all_apartments() -> Dict[str, float]:
-    """Backward-compat view: id -> rate only."""
+    """backward-compat view: id -> rate only."""
     return {k: float(v["rate"]) for k, v in _apartments.items()}
 
 def list_items() -> Dict[str, float]:
-    """Return copy of supplementary items (id -> price)."""
+    """supplementary items (id -> price)."""
     return dict(_items)
 
 def get_all_guests() -> Dict[str, int]:
-    """Copy of guests and their points."""
     return dict(_guests_points)
 
 
 def get_rate(apartment_id: str) -> float:
-    """Nightly rate for id (case-insensitive); 0.0 if not found."""
+    """for id (case-insensitive); 0.0 if not found."""
     aid = apartment_id.lower()
     for k, v in _apartments.items():
         if k.lower() == aid:
             return float(v["rate"])
-
     return 0.0
 
 def get_capacity(apartment_id: str) -> int:
-    """Capacity (beds) for id; 0 if not found."""
+    """(beds) for id; 0 if not found."""
     aid = apartment_id.lower()
     for k, v in _apartments.items():
         if k.lower() == aid:
@@ -232,7 +230,7 @@ def required_extra_beds(num_guests: int, capacity: int) -> int:
     if num_guests <= capacity:
         return 0
     deficit = num_guests - capacity
-    beds = (deficit + 1) // 2  # ceil(deficit/2)
+    beds = (deficit + 1) // 2  
     return min(2, beds)
 
 def apply_points_redemption(pre_total: float, guest_points: int, redeem_blocks: int) -> tuple[float, int]:
@@ -660,7 +658,6 @@ def run_booking() -> bool:
                 "earned_points": earned,
             },
         )
-        print(f"\n[Info] Guest '{guest_name}' now has {new_balance} reward points.")
         return True
 
     except KeyboardInterrupt:
